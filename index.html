@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>CSC3007-assignment2</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        .svgRect {
+            stroke: none;
+            fill: blue;
+        }
+    </style>
+</head>
+
+<body>
+
+    <svg id="chart" viewBox="0 0 960 450">
+    </svg>
+    <div id="countToolTip"></div>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script>
+        var params = {
+            resource_id: '83c21090-bd19-4b54-ab6b-d999c251edcf', // the resource id
+            q: '2020',
+        };
+        var url = new URL('https://data.gov.sg/api/action/datastore_search')
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
+        crime_records = []
+        async function getRecords(url) {
+            const request = await fetch(url);
+            var data = await request.json();
+            return data.result.records;
+        }
+
+
+        // $(document).ready(function () {
+        getRecords(url).then(data => {
+            crime_records = data.map(r => new Object({ crime: r.level_2, count: parseInt(r.value) }))
+            // console.log(crime_records)
+            console.log(crime_records)
+            var margin = { top: 20, right: 20, bottom: 40, left: 50 },
+                width = 960 - margin.left - margin.right,
+                height = 450 - margin.top - margin.bottom;
+            var chart = d3.select("#chart")
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            var xScale = d3.scaleBand()
+                .domain(crime_records.map(d => d.crime))
+                .rangeRound([0, width])
+                .padding(0.1);
+            var yScale = d3.scaleLinear()
+                .domain([0, 18000])
+                .rangeRound([height, 0]);
+            let colorScale = d3.scaleLinear() //Sequential scale (usually from 0 to 1)
+                .domain([0, 18000])
+                .range([0, 1]);
+            var tooltip = d3.select("#countToolTip")
+                .data(crime_records)
+                .enter()
+                .append("div")
+                .style("position", "absolute")
+                .style("visibility", "hidden")
+                .text(d =>d.count);
+            // Add x-axis
+            chart.append("g")
+                .attr("class", "axis axis-x")
+                .attr("transform", "translate(0," + height + ")")
+                .style("font", "8px Arial")
+                .call(d3.axisBottom(xScale));
+
+            // Add y-axis
+            chart.append("g")
+                .attr("class", "axis axis-y")
+                .call(d3.axisLeft(yScale).ticks(10));
+            // Append rectangles
+            chart.selectAll("rect")
+                .data(crime_records)
+                .enter()
+                .append("rect")
+                .attr("x", d => xScale(d.crime))
+                .attr("y", d => yScale(d.count))
+                .attr("width", d => xScale.bandwidth())
+                .attr("height", d => height - yScale(d.count))
+                .attr("fill", d => d3.interpolateTurbo(colorScale(d.count)))
+            // .attr("class", "svgRect");
+        });
+
+        // });
+    </script>
+
+</body>
+
+</html>
