@@ -43,6 +43,12 @@
             let colorScale = d3.scaleLinear() 
                 .domain([0, 18000])
                 .range([0, 1]);
+        chart.append("text")
+            .attr("x", width/2)
+            .attr("y", 2)
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .text("Number of crimes committed in 2020");
         getRecords(url).then(data => {
             crime_records = data.map(r => new Object({ crime: r.level_2, count: parseInt(r.value) }));
             var xScale = d3.scaleBand()
@@ -61,7 +67,7 @@
             chart.append("text")
                 .attr("transform", "translate(" + (width/2) + " ," + (height+40) + ")")
                 .style("text-anchor", "middle")
-                .text("Type of Crimes");
+                .text("Type of Crime");
             var tooltip = d3.select("#svgContainer")
                 .append("div")
                 .style("opacity", 0)
