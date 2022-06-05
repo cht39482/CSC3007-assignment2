@@ -30,14 +30,14 @@
         }
         
 
-        var margin = { top: 20, right: 20, bottom: 40, left: 50 },
-            width = 1100 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom;
+        var margin = { top: 50, right: 60, bottom: 80, left: 100 },
+            width = 1150 - margin.left - margin.right,
+            height = 750 - margin.top - margin.bottom;
         var chart = d3.select("#svgContainer")
             .append("svg")  
-            .attr("width", width + margin.left + margin.right+100)
-            .attr("height", height + margin.top + margin.bottom+100)
-            .attr("viewBox", [0, 0, 1100, 600])
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("viewBox", [0, 0, 1150, 750])
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
             let colorScale = d3.scaleLinear() 
@@ -52,6 +52,16 @@
             var yScale = d3.scalePow().exponent(0.5)
                 .domain([0, 18000])
                 .rangeRound([height, 0]);
+            chart.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -(height/2))
+                .attr("y", -50)
+                .style("text-anchor", "middle")
+                .text("Amount");
+            chart.append("text")
+                .attr("transform", "translate(" + (width/2) + " ," + (height+40) + ")")
+                .style("text-anchor", "middle")
+                .text("Type of Crimes");
             var tooltip = d3.select("#svgContainer")
                 .append("div")
                 .style("opacity", 0)
