@@ -7,12 +7,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <style>
-        .svgRect {
-            stroke: none;
-            fill: blue;
-        }
-    </style>
+    <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
@@ -35,21 +30,21 @@
         }
         
 
-        // $(document).ready(function () {
+        var margin = { top: 20, right: 20, bottom: 40, left: 50 },
+            width = 1100 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+        var chart = d3.select("#svgContainer")
+            .append("svg")  
+            .attr("width", width + margin.left + margin.right+100)
+            .attr("height", height + margin.top + margin.bottom+100)
+            .attr("viewBox", [0, 0, 1100, 600])
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            let colorScale = d3.scaleLinear() 
+                .domain([0, 18000])
+                .range([0, 1]);
         getRecords(url).then(data => {
-            crime_records = data.map(r => new Object({ crime: r.level_2, count: parseInt(r.value) }))
-            // console.log(crime_records)
-            console.log(crime_records)
-            var margin = { top: 20, right: 20, bottom: 40, left: 50 },
-                width = 1100 - margin.left - margin.right,
-                height = 600 - margin.top - margin.bottom;
-            var chart = d3.select("#svgContainer")
-                .append("svg")  
-                .attr("width", width + margin.left + margin.right+100)
-                .attr("height", height + margin.top + margin.bottom+100)
-                .attr("viewBox", [0, 0, 1100, 600])
-                .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            crime_records = data.map(r => new Object({ crime: r.level_2, count: parseInt(r.value) }));
             var xScale = d3.scaleBand()
                 .domain(crime_records.map(d => d.crime))
                 .rangeRound([0, width])
@@ -57,21 +52,14 @@
             var yScale = d3.scalePow().exponent(0.5)
                 .domain([0, 18000])
                 .rangeRound([height, 0]);
-            let colorScale = d3.scaleLinear() //Sequential scale (usually from 0 to 1)
-                .domain([0, 18000])
-                .range([0, 1]);
             var tooltip = d3.select("#svgContainer")
                 .append("div")
                 .style("opacity", 0)
-                .attr("class", "tooltip")
-                .style("background-color", "white")
-                .style("border-radius", "5px")
-                .style("padding", "10px");
+                .attr("class", "tooltip");
             var mouseover = function(d) {
                 tooltip
                 .style("opacity", 1)
             }
-
             var mousemove = function(event,d) {
             tooltip
                 .html(d.count)
@@ -86,7 +74,6 @@
             chart.append("g")
                 .attr("class", "axis axis-x")
                 .attr("transform", "translate(0," + height + ")")
-                .style("font", "10px Arial")
                 .call(d3.axisBottom(xScale));
 
             // Add y-axis
@@ -106,11 +93,7 @@
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
                 .on("mouseleave",mouseleave);
-
-            // .attr("class", "svgRect");
         });
-
-        // });
     </script>
 
 </body>

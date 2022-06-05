@@ -1,0 +1,9 @@
+
+.axis-x{
+    font:"10 px Arial"
+}
+.tooltip{
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px;
+}
